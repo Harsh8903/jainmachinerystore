@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Quote Cart – Jain Machinery Stores</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="ios-fix.css"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #f7f9fb; color: #111; min-height: 100vh; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 1rem; background: #fff; border-bottom: 1px solid #e8e8e8;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .header-company {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-size: 17px; font-weight: 800; letter-spacing: -.3px;
+    color: #111; text-decoration: none; white-space: nowrap;
+  }
+  .header-company:hover { color: #4b41e1; }
+  @media (max-width: 600px) {
+    .header-company { position: static; transform: none; font-size: 14px; }
+    header { gap: .5rem; }
+  }
+  .back-btn { display: flex; align-items: center; background: none; border: none; cursor: pointer; color: #4b41e1; flex-shrink: 0; }
+
+  .page-wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+  h1 { font-size: 24px; font-weight: 800; margin-bottom: .3rem; }
+  .subtitle { font-size: 14px; color: #888; margin-bottom: 2rem; }
+
+  .cart-layout { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; align-items: start; }
+  @media (max-width: 768px) { .cart-layout { grid-template-columns: 1fr; } }
+
+  .cart-items { display: flex; flex-direction: column; gap: 1rem; }
+  .cart-item {
+    background: #fff; border-radius: .75rem; border: 1px solid #e8e8e8;
+    padding: 1rem; display: flex; gap: 1rem; align-items: center;
+  }
+  .item-img { width: 72px; height: 72px; border-radius: .5rem; background: #f2f1ed; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .item-img img { width: 90%; height: 90%; object-fit: contain; }
+  .item-info { flex: 1; min-width: 0; }
+  .item-category { font-size: 11px; font-weight: 700; color: #4b41e1; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .2rem; }
+  .item-name { font-size: 14px; font-weight: 700; line-height: 1.3; margin-bottom: .2rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item-company { font-size: 12px; color: #888; margin-bottom: .4rem; }
+  .item-price { font-size: 15px; font-weight: 800; color: #111; }
+  .item-mrp { font-size: 11px; color: #aaa; text-decoration: line-through; margin-left: .3rem; }
+
+  .item-actions { display: flex; flex-direction: column; align-items: flex-end; gap: .5rem; flex-shrink: 0; }
+  .qty-row { display: flex; align-items: center; gap: .3rem; }
+  .qty-btn {
+    width: 34px; height: 34px; border: 1.5px solid #ddd; border-radius: .4rem;
+    background: #fff; cursor: pointer; font-size: 18px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .qty-btn:active { background: #f0f0f0; border-color: #4b41e1; }
+  .qty-val { font-size: 15px; font-weight: 700; min-width: 28px; text-align: center; }
+  .remove-btn {
+    background: none; border: none; cursor: pointer; font-size: 12px;
+    color: #e53935; font-weight: 600; display: flex; align-items: center; gap: .2rem;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    padding: .3rem .2rem;
+  }
+  .item-subtotal { font-size: 13px; font-weight: 700; color: #4b41e1; }
+
+  .empty-state { text-align: center; padding: 4rem 2rem; background: #fff; border-radius: .75rem; border: 1px solid #e8e8e8; }
+  .empty-state .material-symbols-outlined { font-size: 56px; color: #ddd; display: block; margin-bottom: 1rem; }
+  .empty-state p { color: #888; margin-bottom: 1.2rem; }
+  .empty-state a { background: #111; color: #fff; text-decoration: none; padding: .7rem 1.8rem; border-radius: .5rem; font-weight: 700; font-size: 14px; }
+
+  .summary-panel { background: #fff; border-radius: .75rem; border: 1px solid #e8e8e8; padding: 1.5rem; position: sticky; top: 80px; }
+  .summary-panel h2 { font-size: 16px; font-weight: 800; margin-bottom: 1.2rem; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: .7rem; color: #555; }
+  .summary-row.total { font-size: 18px; font-weight: 800; color: #111; border-top: 1px solid #e8e8e8; padding-top: .8rem; margin-top: .4rem; }
+  .summary-row.savings { color: #009668; font-weight: 600; }
+
+  .customer-form { margin-top: 1.5rem; border-top: 1px solid #e8e8e8; padding-top: 1.2rem; }
+  .customer-form h3 { font-size: 13px; font-weight: 700; color: #555; margin-bottom: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+  .form-field { margin-bottom: .7rem; }
+  .form-field label { display: block; font-size: 12px; font-weight: 600; color: #555; margin-bottom: .3rem; }
+  .form-field input, .form-field textarea {
+    width: 100%; border: 1.5px solid #ddd; border-radius: .4rem;
+    padding: .5rem .7rem; font-size: 14px; font-family: inherit; outline: none; transition: border-color .15s;
+  }
+  .form-field input:focus, .form-field textarea:focus { border-color: #4b41e1; }
+  .form-field textarea { resize: vertical; min-height: 70px; }
+
+  .btn-submit {
+    width: 100%; background: #111; color: #fff; border: none; border-radius: .5rem;
+    padding: .9rem; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 1rem;
+    display: flex; align-items: center; justify-content: center; gap: .5rem; transition: background .15s;
+  }
+  .btn-submit:hover { background: #4b41e1; }
+  .btn-clear { width: 100%; background: none; border: 1.5px solid #ddd; border-radius: .5rem; padding: .6rem; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: .6rem; color: #888; }
+  .btn-clear:hover { border-color: #e53935; color: #e53935; }
+
+  #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: #009668; color: #fff; padding: .8rem 2rem; border-radius: 9999px; font-weight: 700; font-size: 14px; display: none; z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,.2); }
+  #wa-modal { position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; }
+  #wa-modal-box { background: #fff; border-radius: 1rem; padding: 2rem; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,.2); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<script src="dailyCode.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<header>
+  <a href="index.html" class="header-company">Jain Machinery Stores</a>
+  <button class="back-btn" onclick="history.back()">
+    <span class="material-symbols-outlined" style="font-size:22px;">arrow_back</span>
+  </button>
+</header>
+
+<div class="page-wrap">
+  <h1>Quote Cart</h1>
+  <p class="subtitle" id="item-count">0 items selected for quotation</p>
+  <div class="cart-layout">
+    <div class="cart-items" id="cart-items"></div>
+    <div class="summary-panel">
+      <h2>Quote Summary</h2>
+      <div class="summary-row"><span>Subtotal</span><span id="s-subtotal">&#8377;0.00</span></div>
+      <div class="summary-row savings"><span>You Save</span><span id="s-savings">&#8377;0.00</span></div>
+      <div class="summary-row"><span>Delivery</span><span>Free on bulk</span></div>
+      <div class="summary-row total"><span>Total</span><span id="s-total">&#8377;0.00</span></div>
+      <div class="customer-form">
+        <h3>Customer Details</h3>
+        <div class="form-field"><label>Customer Name *</label><input type="text" id="f-name" placeholder="e.g. Ramesh Kumar"/></div>
+        <div class="form-field"><label>Company</label><input type="text" id="f-company" placeholder="e.g. ABC Traders"/></div>
+        <div class="form-field"><label>Email</label><input type="email" id="f-email" placeholder="email@example.com"/></div>
+        <div class="form-field"><label>Phone</label><input type="tel" id="f-phone" placeholder="+91 00000 00000"/></div>
+        <div class="form-field"><label>Delivery Address</label><textarea id="f-address" placeholder="Street, City, State"></textarea></div>
+        <div class="form-field"><label>Notes</label><textarea id="f-notes" placeholder="Special requirements..."></textarea></div>
+        <button class="btn-submit" id="btn-submit">
+          <span class="material-symbols-outlined" style="font-size:20px;">send</span> Submit Quotation
+        </button>
+        <button class="btn-clear" onclick="clearCart()">Clear Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast">&#10003; Quotation submitted successfully!</div>
+<div id="wa-modal">
+  <div id="wa-modal-box">
+    <span class="material-symbols-outlined" style="font-size:48px;color:#25D366;">chat</span>
+    <h2 style="font-size:17px;font-weight:800;margin:.75rem 0 .4rem;">PDF Downloaded!</h2>
+    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:1.25rem;">Your quotation PDF has been saved.<br>Open WhatsApp and attach the PDF file.</p>
+    <button id="wa-open-btn" style="width:100%;background:#25D366;color:#fff;border:none;border-radius:.5rem;padding:.8rem;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.6rem;">
+      <span class="material-symbols-outlined" style="font-size:20px;">open_in_new</span> Open WhatsApp
+    </button>
+    <button onclick="document.getElementById('wa-modal').style.display='none'" style="width:100%;background:none;border:1.5px solid #ddd;border-radius:.5rem;padding:.65rem;font-size:13px;font-weight:600;cursor:pointer;color:#888;">Close</button>
+  </div>
+</div>
+
+<script>
+
+
+function getCart() { return JSON.parse(localStorage.getItem('qf_cart') || '[]'); }
+function saveCart(c) { localStorage.setItem('qf_cart', JSON.stringify(c)); }
+
+function render() {
+  var cart = getCart();
+  var container = document.getElementById('cart-items');
+  container.innerHTML = '';
+
+  if (!cart.length) {
+    container.innerHTML =
+      '<div class="empty-state">' +
+        '<span class="material-symbols-outlined">shopping_cart</span>' +
+        '<p>Your quote cart is empty.</p>' +
+        '<a href="index.html">Browse Products</a>' +
+      '</div>';
+    document.getElementById('item-count').textContent = '0 items selected for quotation';
+    document.getElementById('s-subtotal').textContent = '\u20b90.00';
+    document.getElementById('s-savings').textContent  = '\u20b90.00';
+    document.getElementById('s-total').textContent    = '\u20b90.00';
+    return;
+  }
+
+  var subtotal = 0, mrpTotal = 0;
+  for (var i = 0; i < cart.length; i++) {
+    var item = cart[i];
+    item.price = Number(item.price) || 0;
+    item.mrp   = Number(item.mrp)   || item.price;
+    subtotal  += item.price * item.qty;
+    mrpTotal  += item.mrp   * item.qty;
+
+    var div = document.createElement('div');
+    div.className = 'cart-item';
+
+    var imgHtml = '<div class="item-img"><img src="' + (item.img || '') + '" alt="" onerror="this.style.display=\'none\'"/></div>';
+    var infoHtml =
+      '<div class="item-info">' +
+        '<div class="item-category">' + (item.category || '') + '</div>' +
+        '<div class="item-name">'     + (item.name     || '') + '</div>' +
+        '<div class="item-company">'  + (item.company  || '') + '</div>' +
+        '<div>' +
+          '<span class="item-price">\u20b9' + item.price.toFixed(2) + '</span>' +
+          '<span class="item-mrp">MRP \u20b9' + item.mrp.toFixed(2) + '</span>' +
+        '</div>' +
+      '</div>';
+    var actHtml =
+      '<div class="item-actions">' +
+        '<div class="qty-row">' +
+          '<button class="qty-btn" data-idx="' + i + '" data-delta="-1">\u2212</button>' +
+          '<span class="qty-val">' + item.qty + '</span>' +
+          '<button class="qty-btn" data-idx="' + i + '" data-delta="1">+</button>' +
+        '</div>' +
+        '<div class="item-subtotal">\u20b9' + (item.price * item.qty).toFixed(2) + '</div>' +
+        '<button class="remove-btn" data-idx="' + i + '">' +
+          '<span style="pointer-events:none;">\u{1F5D1}</span> Remove' +
+        '</button>' +
+      '</div>';
+
+    div.innerHTML = imgHtml + infoHtml + actHtml;
+    container.appendChild(div);
+  }
+
+  var savings  = mrpTotal - subtotal;
+  var totalQty = cart.reduce(function(s, x) { return s + x.qty; }, 0);
+  document.getElementById('item-count').textContent = totalQty + ' item' + (totalQty !== 1 ? 's' : '') + ' selected for quotation';
+  document.getElementById('s-subtotal').textContent = '\u20b9' + subtotal.toFixed(2);
+  document.getElementById('s-savings').textContent  = '\u20b9' + savings.toFixed(2);
+  document.getElementById('s-total').textContent    = '\u20b9' + subtotal.toFixed(2);
+}
+
+function changeQty(idx, delta) {
+  var cart = getCart();
+  if (!cart[idx]) return;
+  cart[idx].qty = (cart[idx].qty || 1) + delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  saveCart(cart);
+  render();
+}
+
+function removeItem(idx) {
+  var cart = getCart();
+  cart.splice(idx, 1);
+  saveCart(cart);
+  render();
+}
+
+// Delegated click — walks up DOM to find data-idx, works on all mobile browsers
+document.getElementById('cart-items').addEventListener('click', function(e) {
+  var el = e.target;
+  for (var i = 0; i < 4; i++) {
+    if (!el || el === this) break;
+    if (el.dataset && el.dataset.idx !== undefined) {
+      e.preventDefault();
+      var idx = parseInt(el.dataset.idx, 10);
+      if (el.dataset.delta !== undefined) {
+        changeQty(idx, parseInt(el.dataset.delta, 10));
+      } else if (el.classList.contains('remove-btn')) {
+        removeItem(idx);
+      }
+      return;
+    }
+    el = el.parentElement;
+  }
+});
+
+function clearCart() {
+  if (confirm('Clear all items from the quote cart?')) {
+    localStorage.removeItem('qf_cart');
+    render();
+  }
+}
+
+document.getElementById('btn-submit').addEventListener('click', function() {
+  var cart = getCart();
+  if (!cart.length) { alert('Add at least one product to the cart.'); return; }
+  var name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Please enter the customer name.'); return; }
+
+  var company = document.getElementById('f-company').value.trim();
+  var email   = document.getElementById('f-email').value.trim();
+  var phone   = document.getElementById('f-phone').value.trim();
+  var address = document.getElementById('f-address').value.trim();
+  var notes   = document.getElementById('f-notes').value.trim();
+  var date    = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF({ unit:'mm', format:'a4' });
+  var pw = 210, lm = 15, rm = 15, cw = pw - lm - rm;
+  var y = 15;
+
+  doc.setFillColor(75,65,225); doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('Jain Machinery Stores', lm, 12);
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text('6, Talgali, Siyaganj, Indore, MP 452007  |  +91 9425053740', lm, 20);
+  doc.text('Date: ' + date, pw - rm, 20, { align:'right' });
+  y = 36;
+
+  doc.setTextColor(17,17,17); doc.setFillColor(237,233,255);
+  doc.rect(lm,y,cw,7,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(75,65,225);
+  doc.text('CUSTOMER DETAILS', lm+3, y+5); y += 10;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60);
+  var custLines = [['Name',name]];
+  if (company) custLines.push(['Company',company]);
+  if (email)   custLines.push(['Email',email]);
+  if (phone)   custLines.push(['Phone',phone]);
+  if (address) custLines.push(['Address',address]);
+  if (notes)   custLines.push(['Notes',notes]);
+  custLines.forEach(function(row) {
+    doc.setFont('helvetica','bold'); doc.text(row[0]+':', lm, y);
+    doc.setFont('helvetica','normal');
+    var wrapped = doc.splitTextToSize(row[1], cw-30);
+    doc.text(wrapped, lm+28, y); y += wrapped.length * 5 + 1;
+  });
+  y += 4;
+
+  doc.setFillColor(237,233,255); doc.rect(lm,y,cw,7,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(75,65,225);
+  doc.text('ITEMS', lm+3, y+5); y += 10;
+  doc.setFillColor(245,245,245); doc.rect(lm,y,cw,6,'F');
+  doc.setFontSize(8); doc.setTextColor(100,100,100);
+  doc.text('#',lm+2,y+4); doc.text('Product',lm+8,y+4); doc.text('Qty',lm+110,y+4);
+  doc.text('Price',lm+125,y+4); doc.text('MRP',lm+145,y+4); doc.text('Subtotal',lm+163,y+4);
+  y += 8;
+
+  var subtotal = 0, mrpTotal = 0;
+  doc.setTextColor(17,17,17);
+  cart.forEach(function(item, i) {
+    if (y > 265) { doc.addPage(); y = 15; }
+    var sub = item.price * item.qty;
+    subtotal += sub; mrpTotal += item.mrp * item.qty;
+    doc.setFillColor.apply(doc, i%2===0 ? [255,255,255] : [250,250,252]);
+    doc.rect(lm,y-1,cw,7,'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    doc.text(String(i+1),lm+2,y+4);
+    var nw = doc.splitTextToSize(item.name,95);
+    doc.text(nw,lm+8,y+4);
+    doc.text(String(item.qty),lm+110,y+4);
+    doc.text('Rs.'+item.price.toFixed(2),lm+125,y+4);
+    doc.text('Rs.'+item.mrp.toFixed(2),lm+145,y+4);
+    doc.text('Rs.'+sub.toFixed(2),lm+163,y+4);
+    y += nw.length > 1 ? nw.length*5+2 : 8;
+  });
+
+  y += 3; doc.setDrawColor(200,200,200); doc.line(lm,y,lm+cw,y); y += 5;
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(17,17,17);
+  doc.text('Subtotal:',lm+130,y); doc.setFont('helvetica','normal'); doc.text('Rs.'+subtotal.toFixed(2),lm+163,y); y+=6;
+  doc.setFont('helvetica','bold'); doc.setTextColor(0,150,104);
+  doc.text('You Save:',lm+130,y); doc.setFont('helvetica','normal'); doc.text('Rs.'+(mrpTotal-subtotal).toFixed(2),lm+163,y); y+=6;
+  doc.setTextColor(17,17,17); doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('TOTAL:',lm+130,y); doc.text('Rs.'+subtotal.toFixed(2),lm+163,y); y+=10;
+  doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(150,150,150);
+  doc.text('Thank you for your enquiry! We will get back to you shortly.', pw/2, y, {align:'center'});
+
+  doc.save('Quotation_' + name.replace(/\s+/g,'_') + '_' + Date.now() + '.pdf');
+
+  var itemLines = cart.map(function(item,i) {
+    return (i+1)+'. *'+item.name+'*\n    Qty: '+item.qty+' | Price: Rs.'+item.price.toFixed(2)+' | Subtotal: Rs.'+(item.price*item.qty).toFixed(2);
+  }).join('\n');
+
+  var msg = '\uD83E\uDDFE *New Quotation Request*\n*Jain Machinery Stores*\n*Date:* '+date+
+    '\n\n\uD83D\uDC64 *Customer Details*\n*Name:* '+name+
+    (company?'\n*Company:* '+company:'')+(phone?'\n*Phone:* '+phone:'')+(email?'\n*Email:* '+email:'')+
+    (address?'\n*Address:* '+address:'')+(notes?'\n*Notes:* '+notes:'')+
+    '\n\n\uD83D\uDED2 *Items Ordered*\n'+itemLines+
+    '\n\n\uD83D\uDCB0 *Subtotal:* Rs.'+subtotal.toFixed(2)+
+    '\n\uD83D\uDC9A *You Save:* Rs.'+(mrpTotal-subtotal).toFixed(2)+
+    '\n\u2705 *Total: Rs.'+subtotal.toFixed(2)+'*\n\n_Please find the quotation PDF attached._';
+
+  var modal = document.getElementById('wa-modal');
+  modal.style.display = 'flex';
+  document.getElementById('wa-open-btn').onclick = async function() {
+    let whatsappNum = '917693048234';
+    try {
+      whatsappNum = await dbGetSetting('whatsapp_number', '917693048234');
+    } catch (err) {
+      console.error('Error fetching whatsapp_number:', err);
+    }
+    window.open('https://wa.me/' + whatsappNum + '?text=' + encodeURIComponent(msg), '_blank');
+    modal.style.display = 'none';
+  };
+
+  localStorage.removeItem('qf_cart');
+  render();
+  ['f-name','f-company','f-email','f-phone','f-address','f-notes'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
+  var toast = document.getElementById('toast');
+  toast.style.display = 'block';
+  setTimeout(function() { toast.style.display = 'none'; }, 3500);
+});
+
+render();
+</script>
+</body>
+</html>

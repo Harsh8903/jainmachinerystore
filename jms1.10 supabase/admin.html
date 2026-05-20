@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Admin – QuoteFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="ios-fix.css"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #f7f9fb; color: #111; min-height: 100vh; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 1rem; background: #fff; border-bottom: 1px solid #e8e8e8;
+    position: sticky; top: 0; z-index: 50; position: relative;
+  }
+  .header-company {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-size: 17px; font-weight: 800; letter-spacing: -.3px;
+    color: #111; text-decoration: none; white-space: nowrap;
+  }
+  .header-company:hover { color: #4b41e1; }
+  @media (max-width: 600px) {
+    .header-company { position: static; transform: none; font-size: 13px; }
+    header { gap: .4rem; }
+  }
+
+  .logo { font-size: 20px; font-weight: 900; letter-spacing: -.5px; text-decoration: none; color: #111; }
+  .logo span { font-weight: 400; color: #888; }
+  .admin-badge { background: #4b41e1; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 9999px; letter-spacing: .05em; }
+  h1 { font-size: 24px; font-weight: 800; margin-bottom: .3rem; }
+  .subtitle { font-size: 14px; color: #888; margin-bottom: 2rem; }
+
+  /* ── FORM CARD ── */
+  .form-card {
+    background: #fff; border-radius: .75rem; border: 1px solid #e8e8e8;
+    padding: 1.8rem; margin-bottom: 2.5rem;
+  }
+  .form-card h2 { font-size: 17px; font-weight: 800; margin-bottom: 1.4rem; display: flex; align-items: center; gap: .5rem; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-field { display: flex; flex-direction: column; gap: .3rem; }
+  .form-field.full { grid-column: 1 / -1; }
+  .form-field label { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .04em; }
+  .form-field input, .form-field select, .form-field textarea {
+    border: 1.5px solid #ddd; border-radius: .4rem;
+    padding: .55rem .75rem; font-size: 14px; font-family: inherit; outline: none;
+    transition: border-color .15s; background: #fff;
+  }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: #4b41e1; }
+  .form-field textarea { resize: vertical; min-height: 80px; }
+
+  /* image preview */
+  .img-preview-wrap { margin-top: .5rem; }
+  #img-preview {
+    width: 100px; height: 100px; border-radius: .5rem; object-fit: contain;
+    background: #f2f1ed; border: 1.5px solid #ddd; display: none;
+  }
+
+  /* size-price table */
+  .size-price-table { width:100%; border-collapse:collapse; margin-top:.6rem; }
+  .size-price-table th { font-size:11px; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:.04em; padding:.4rem .5rem; border-bottom:1.5px solid #eee; text-align:left; }
+  .size-price-table td { padding:.35rem .4rem; }
+  .size-price-table input { border:1.5px solid #ddd; border-radius:.35rem; padding:.4rem .5rem; font-size:13px; width:100%; outline:none; }
+  .size-price-table input:focus { border-color:#4b41e1; }
+  .size-price-table .del-row { background:none; border:none; cursor:pointer; color:#e53935; padding:.2rem .4rem; border-radius:.3rem; }
+  .size-price-table .del-row:hover { background:#fff0f0; }
+  .tags-wrap {
+    display: flex; flex-wrap: wrap; gap: .4rem; align-items: center;
+    border: 1.5px solid #ddd; border-radius: .4rem; padding: .4rem .6rem;
+    min-height: 42px; cursor: text; background: #fff; transition: border-color .15s;
+  }
+  .tags-wrap:focus-within { border-color: #4b41e1; }
+  .tag {
+    background: #4b41e1; color: #fff; font-size: 12px; font-weight: 600;
+    padding: 2px 10px; border-radius: 9999px; display: flex; align-items: center; gap: .3rem;
+  }
+  .tag button { background: none; border: none; color: #fff; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+  #size-input { border: none; outline: none; font-size: 14px; font-family: inherit; min-width: 80px; flex: 1; }
+
+  /* form actions */
+  .form-actions { display: flex; gap: .8rem; margin-top: 1.4rem; }
+  .btn-primary {
+    background: #111; color: #fff; border: none; border-radius: .5rem;
+    padding: .75rem 2rem; font-size: 14px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; gap: .4rem; transition: background .15s;
+  }
+  .btn-primary:hover { background: #4b41e1; }
+  .btn-secondary {
+    background: none; border: 1.5px solid #ddd; border-radius: .5rem;
+    padding: .75rem 1.5rem; font-size: 14px; font-weight: 600; cursor: pointer;
+    color: #555; transition: border-color .15s;
+  }
+  .btn-secondary:hover { border-color: #e53935; color: #e53935; }
+
+  /* ── PRODUCT TABLE ── */
+  .table-card { background: #fff; border-radius: .75rem; border: 1px solid #e8e8e8; overflow: hidden; }
+  .table-header { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 1.5rem; border-bottom: 1px solid #e8e8e8; }
+  .table-header h2 { font-size: 17px; font-weight: 800; }
+  .product-count { font-size: 13px; color: #888; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .05em; padding: .8rem 1rem; border-bottom: 1px solid #e8e8e8; background: #fafafa; }
+  td { padding: .85rem 1rem; border-bottom: 1px solid #f0f0f0; font-size: 14px; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafafa; }
+
+  .td-img { width: 48px; height: 48px; border-radius: .4rem; object-fit: contain; background: #f2f1ed; }
+  .td-name { font-weight: 700; max-width: 200px; }
+  .td-cat { display: inline-block; background: #ede9ff; color: #4b41e1; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; }
+  .td-price { font-weight: 800; }
+  .td-mrp { color: #aaa; text-decoration: line-through; font-size: 12px; }
+  .td-sizes { font-size: 12px; color: #555; max-width: 120px; }
+  .action-btn {
+    background: none; border: none; cursor: pointer; padding: .3rem;
+    border-radius: .3rem; transition: background .15s; color: #555;
+  }
+  .action-btn:hover { background: #f0f0f0; }
+  .action-btn.del:hover { color: #e53935; background: #fff0f0; }
+
+  .empty-table { text-align: center; padding: 3rem; color: #aaa; }
+  .empty-table .material-symbols-outlined { font-size: 48px; display: block; margin-bottom: .8rem; }
+
+  /* toast */
+  #toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    background: #009668; color: #fff; padding: .7rem 2rem; border-radius: 9999px;
+    font-weight: 700; font-size: 14px; display: none; z-index: 999;
+    box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="supabase.js"></script>
+</head>
+<body>
+<script src="dailyCode.js"></script>
+
+<header>
+  <a href="index.html" class="header-company">Jain Machinery Stores</a>
+  <div style="display:flex; align-items:center; gap: .75rem;">
+    <span class="admin-badge">ADMIN</span>
+    <button onclick="window.location.href='credentials.html'" style="background:none; border:none; cursor:pointer; display:flex; align-items:center; color:#555; font-size:12px; gap:0.2rem; font-weight:600;"><span class="material-symbols-outlined" style="font-size:16px;">manage_accounts</span> Credentials</button>
+    <button onclick="window.location.href='otp-settings.html'" style="background:none; border:none; cursor:pointer; display:flex; align-items:center; color:#555; font-size:12px; gap:0.2rem; font-weight:600;"><span class="material-symbols-outlined" style="font-size:16px;">pin</span> OTP</button>
+    <button onclick="logout()" style="background:none; border:none; cursor:pointer; display:flex; align-items:center; color:#555; font-size:12px; gap:0.2rem; font-weight:600;"><span class="material-symbols-outlined" style="font-size:16px;">logout</span> Logout</button>
+  </div>
+  <a href="index.html" style="display:flex;align-items:center;gap:.3rem;font-size:14px;font-weight:600;color:#4b41e1;text-decoration:none;">
+    <span class="material-symbols-outlined" style="font-size:20px;">storefront</span> View Store
+  </a>
+</header>
+
+<div class="page-wrap">
+  <h1>Product Management</h1>
+  <p class="subtitle">Add, edit, or remove products from the marketplace.</p>
+
+  <!-- WHATSAPP CONFIG CARD -->
+  <div class="settings-card" style="background:#fff; border:1px solid #e8e8e8; border-radius:.75rem; padding:1.25rem; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <div style="background:#25D366; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <span class="material-symbols-outlined" style="font-size:24px;">chat</span>
+      </div>
+      <div>
+        <h3 style="font-size:15px; font-weight:700; margin:0; color:#111;">Quotation WhatsApp Number</h3>
+        <p style="font-size:12px; color:#666; margin:2px 0 0 0;">Customer quotations will be sent to this number.</p>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.5rem; flex:1; max-width:350px; min-width:240px;">
+      <input type="text" id="cfg-whatsapp-phone" placeholder="e.g. 917693048234" style="flex:1; border:1.5px solid #ddd; border-radius:.4rem; padding:.55rem .75rem; font-size:14px; outline:none; font-weight:600; color:#111;" />
+      <button onclick="saveWhatsAppNumber()" style="background:#111; color:#fff; border:none; border-radius:.4rem; padding:.55rem 1.2rem; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:0.3rem; transition: background 0.15s; white-space:nowrap;">
+        <span class="material-symbols-outlined" style="font-size:16px;">save</span> Save
+      </button>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT FORM -->
+  <div class="form-card">
+    <h2>
+      <span class="material-symbols-outlined" style="font-size:20px;color:#4b41e1;" id="form-icon">add_circle</span>
+      <span id="form-title">Add New Product</span>
+    </h2>
+
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Product Name *</label>
+        <input type="text" id="f-name" placeholder="e.g. Pro-Series Headphones"/>
+      </div>
+      <div class="form-field">
+        <label>Company / Brand *</label>
+        <input type="text" id="f-company" placeholder="e.g. SoundTech Industries"/>
+      </div>
+      <div class="form-field">
+        <label>Category *</label>
+        <div style="display:flex;gap:.5rem;align-items:center;">
+          <select id="f-category" style="flex:1;"></select>
+          <button type="button" onclick="openCatManager()" title="Manage Categories" style="background:#4b41e1;color:#fff;border:none;border-radius:.4rem;padding:.55rem .7rem;cursor:pointer;display:flex;align-items:center;">
+            <span class="material-symbols-outlined" style="font-size:18px;">tune</span>
+          </button>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Price (₹) *</label>
+        <input type="number" id="f-price" placeholder="0.00" min="0" step="0.01"/>
+      </div>
+      <div class="form-field">
+        <label>MRP / Original Price (₹)</label>
+        <input type="number" id="f-mrp" placeholder="0.00" min="0" step="0.01"/>
+      </div>
+
+      <div class="form-field">
+        <label>Badge Label</label>
+        <input type="text" id="f-badge" placeholder="e.g. NEW, BULK DEAL (leave blank for none)"/>
+      </div>
+      <div class="form-field">
+        <label>Personal Item Code</label>
+        <input type="text" id="f-item-code" placeholder="e.g. ITEM-001"/>
+      </div>
+      <div class="form-field">
+        <label>HSN Code</label>
+        <input type="text" id="f-hsn-code" placeholder="e.g. 84713010"/>
+      </div>
+      <div class="form-field full">
+        <label>Image URLs (Up to 4 images)</label>
+        <div style="display:flex; flex-direction:column; gap:0.5rem;">
+          <input type="url" id="f-img-1" placeholder="Image 1 URL (Main Image)" oninput="previewImg()"/>
+          <input type="url" id="f-img-2" placeholder="Image 2 URL (Optional)" oninput="previewImg()"/>
+          <input type="url" id="f-img-3" placeholder="Image 3 URL (Optional)" oninput="previewImg()"/>
+          <input type="url" id="f-img-4" placeholder="Image 4 URL (Optional)" oninput="previewImg()"/>
+        </div>
+        <div class="img-preview-wrap" id="img-preview-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;"></div>
+      </div>
+      <div class="form-field full">
+        <label>Description</label>
+        <textarea id="f-desc" placeholder="Describe the product — features, materials, use cases..."></textarea>
+      </div>
+      <div class="form-field full" id="size-name-field">
+        <label>Size Label Name <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#aaa;">e.g. Qty, Pis, Pack, Box</span></label>
+        <input type="text" id="f-size-name" placeholder="e.g. Qty"/>
+      </div>
+      <div class="form-field full">
+        <label>Quantity Selection Style</label>
+        <div style="display:flex;gap:1.5rem;align-items:center;margin-top:.4rem;">
+          <label style="display:flex;align-items:center;gap:.4rem;font-size:14px;cursor:pointer;">
+            <input type="radio" id="qty-type-input" name="f-qty-type" value="input" checked onchange="toggleSizeTable()"> Simple Textbox (+/-)
+          </label>
+          <label style="display:flex;align-items:center;gap:.4rem;font-size:14px;cursor:pointer;">
+            <input type="radio" id="qty-type-tiers" name="f-qty-type" value="tiers" onchange="toggleSizeTable()"> Size / Tier Buttons
+          </label>
+        </div>
+      </div>
+      <!-- Size/Tier table — shown only when tiers selected -->
+      <div class="form-field full" id="size-tier-section" style="display:none;">
+        <label>Sizes with Price &amp; MRP <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#aaa;">each size has its own price</span></label>
+        <table class="size-price-table">
+          <thead><tr><th>Size / Label</th><th>Price (₹)</th><th>MRP (₹)</th><th></th></tr></thead>
+          <tbody id="size-rows"></tbody>
+        </table>
+        <button type="button" onclick="addSizeRow()" style="margin-top:.6rem;background:#4b41e1;color:#fff;border:none;border-radius:.4rem;padding:.45rem 1rem;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:.3rem;">
+          <span class="material-symbols-outlined" style="font-size:16px;">add</span> Add Size
+        </button>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-primary" onclick="saveProduct()">
+        <span class="material-symbols-outlined" style="font-size:18px;" id="save-icon">save</span>
+        <span id="save-label">Save Product</span>
+      </button>
+      <button class="btn-secondary" onclick="resetForm()">Cancel / Reset</button>
+    </div>
+  </div>
+
+  <!-- PRODUCT LIST TABLE -->
+  <div class="table-card">
+    <div class="table-header" style="flex-direction: column; align-items: stretch; gap: 1rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <h2>All Products</h2>
+        <div style="display:flex;gap:.6rem;align-items:center;">
+          <span class="product-count" id="product-count">0 products</span>
+          <button onclick="exportExcel()" style="display:flex;align-items:center;gap:.3rem;background:#009668;color:#fff;border:none;border-radius:.4rem;padding:.45rem .9rem;font-size:13px;font-weight:700;cursor:pointer;">
+            <span class="material-symbols-outlined" style="font-size:16px;">download</span> Export Excel
+          </button>
+          <label style="display:flex;align-items:center;gap:.3rem;background:#4b41e1;color:#fff;border-radius:.4rem;padding:.45rem .9rem;font-size:13px;font-weight:700;cursor:pointer;">
+            <span class="material-symbols-outlined" style="font-size:16px;">upload</span> Import Excel
+            <input type="file" id="import-file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="importExcel(event)"/>
+          </label>
+        </div>
+      </div>
+      <div style="display: flex; gap: .8rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px; position: relative;">
+          <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 18px;">search</span>
+          <input type="text" id="search-filter" placeholder="Search products..." style="width: 100%; border: 1.5px solid #ddd; border-radius: .4rem; padding: .55rem .75rem .55rem 2rem; font-size: 14px; outline: none;" oninput="renderTable()">
+        </div>
+        <select id="category-filter" style="border: 1.5px solid #ddd; border-radius: .4rem; padding: .55rem .75rem; font-size: 14px; outline: none; background: #fff;" onchange="renderTable()"></select>
+        <select id="company-filter" style="border: 1.5px solid #ddd; border-radius: .4rem; padding: .55rem .75rem; font-size: 14px; outline: none; background: #fff;" onchange="renderTable()">
+          <option value="">All Companies</option>
+        </select>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>MRP</th>
+            <th>Sizes</th>
+
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="product-tbody"></tbody>
+      </table>
+      <div class="empty-table" id="empty-msg" style="display:none;">
+        <span class="material-symbols-outlined">inventory_2</span>
+        No products yet. Add your first product above.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Category Manager Modal -->
+<div id="cat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:.75rem;padding:1.5rem;width:360px;max-width:90vw;box-shadow:0 8px 40px rgba(0,0,0,.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+      <h3 style="font-size:16px;font-weight:800;">Manage Categories</h3>
+      <button onclick="closeCatManager()" style="background:none;border:none;cursor:pointer;font-size:20px;color:#888;line-height:1;">×</button>
+    </div>
+    <div id="cat-list" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;max-height:240px;overflow-y:auto;"></div>
+    <div style="display:flex;gap:.5rem;">
+      <input id="cat-new-input" type="text" placeholder="New category name" style="flex:1;border:1.5px solid #ddd;border-radius:.4rem;padding:.5rem .75rem;font-size:14px;outline:none;" onkeydown="if(event.key==='Enter')addCategory()"/>
+      <button onclick="addCategory()" style="background:#4b41e1;color:#fff;border:none;border-radius:.4rem;padding:.5rem 1rem;font-size:14px;font-weight:700;cursor:pointer;">Add</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ── Categories ──
+async function populateCategorySelects() {
+  const cats = await dbGetCategories();
+  const prevFilter = document.getElementById('category-filter').value;
+  const opts = '<option value="">— Select Category —</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  const filterOpts = '<option value="">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  document.getElementById('f-category').innerHTML = opts;
+  document.getElementById('category-filter').innerHTML = filterOpts;
+  if (prevFilter) document.getElementById('category-filter').value = prevFilter;
+}
+
+async function openCatManager() {
+  await renderCatList();
+  document.getElementById('cat-modal').style.display = 'flex';
+}
+
+async function closeCatManager() {
+  document.getElementById('cat-modal').style.display = 'none';
+  const prevCat = document.getElementById('f-category').value;
+  await populateCategorySelects();
+  // restore form category selection if it still exists
+  if (prevCat) document.getElementById('f-category').value = prevCat;
+  renderTable();
+}
+
+async function renderCatList() {
+  const cats = await dbGetCategories();
+  const list = document.getElementById('cat-list');
+  list.innerHTML = cats.length ? cats.map(c => `
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#f7f9fb;border-radius:.4rem;padding:.45rem .75rem;">
+      <span style="font-size:14px;font-weight:600;">${c}</span>
+      <button onclick="removeCategory('${c.replace(/'/g,"\\'")}')"
+        style="background:none;border:none;cursor:pointer;color:#e53935;display:flex;align-items:center;" title="Remove">
+        <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+      </button>
+    </div>`).join('')
+  : '<p style="font-size:13px;color:#aaa;text-align:center;">No categories yet.</p>';
+}
+
+async function addCategory() {
+  const input = document.getElementById('cat-new-input');
+  const val = input.value.trim();
+  if (!val) return;
+  const btn = document.querySelector('#cat-modal button[onclick="addCategory()"]');
+  if (btn) btn.disabled = true;
+  const ok = await dbSaveCategory(val);
+  if (btn) btn.disabled = false;
+  if (!ok) { alert('Failed to save category.'); return; }
+  input.value = '';
+  await renderCatList();
+}
+
+async function removeCategory(name) {
+  if (!confirm(`Remove category "${name}"?`)) return;
+  const ok = await dbDeleteCategory(name);
+  if (!ok) { alert('Failed to remove category.'); return; }
+  await renderCatList();
+}
+
+// ── Auth Check ──
+if (sessionStorage.getItem('qf_admin_logged_in') !== 'true') {
+  window.location.href = 'login.html';
+}
+
+function logout() {
+  sessionStorage.removeItem('qf_admin_logged_in');
+  window.location.href = 'login.html';
+}
+
+function getProducts() {
+  const stored = localStorage.getItem('qf_products');
+  if (stored) return JSON.parse(stored);
+  localStorage.setItem('qf_products', JSON.stringify(DEFAULT_PRODUCTS));
+  return DEFAULT_PRODUCTS;
+}
+function saveProducts(list) { localStorage.setItem('qf_products', JSON.stringify(list)); }
+
+// ── Size/Tier table ──
+function toggleSizeTable() {
+  const isTiers = document.getElementById('qty-type-tiers').checked;
+  document.getElementById('size-tier-section').style.display = isTiers ? 'block' : 'none';
+  document.getElementById('size-name-field').style.display = isTiers ? 'block' : 'none';
+}
+
+function addSizeRow(label='', price='', mrp='') {
+  const tbody = document.getElementById('size-rows');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" placeholder="e.g. 1 Pis" value="${label}"/></td>
+    <td><input type="number" placeholder="0.00" step="0.01" min="0" value="${price}"/></td>
+    <td><input type="number" placeholder="0.00" step="0.01" min="0" value="${mrp}"/></td>
+    <td><button type="button" class="del-row" onclick="this.closest('tr').remove()">
+      <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+    </button></td>`;
+  tbody.appendChild(tr);
+}
+
+function getSizeRows() {
+  const rows = document.querySelectorAll('#size-rows tr');
+  const result = [];
+  rows.forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    const label = inputs[0].value.trim();
+    const price = inputs[1].value.trim();
+    const mrp   = inputs[2].value.trim();
+    if (label) result.push({ label, price: price ? Number(price) : null, mrp: mrp ? Number(mrp) : null });
+  });
+  return result;
+}
+
+function clearSizeRows() {
+  document.getElementById('size-rows').innerHTML = '';
+}
+
+// ── Image preview ──
+function previewImg() {
+  const container = document.getElementById('img-preview-container');
+  if (!container) return;
+  container.innerHTML = '';
+  const urls = [
+    document.getElementById('f-img-1').value.trim(),
+    document.getElementById('f-img-2').value.trim(),
+    document.getElementById('f-img-3').value.trim(),
+    document.getElementById('f-img-4').value.trim()
+  ].filter(Boolean);
+  urls.forEach(url => {
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.display = 'block';
+    img.style.height = '60px';
+    img.style.objectFit = 'contain';
+    img.style.borderRadius = '0.4rem';
+    img.style.background = '#f2f1ed';
+    container.appendChild(img);
+  });
+}
+
+// ── Edit state ──
+let editId = null;
+
+
+
+function resetForm() {
+  editId = null;
+  ['f-name','f-company','f-price','f-mrp','f-badge','f-desc','f-size-name','f-img-1','f-img-2','f-img-3','f-img-4','f-item-code','f-hsn-code'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-category').value = '';
+  document.getElementById('qty-type-input').checked = true;
+  clearSizeRows();
+  toggleSizeTable();
+  const previewContainer = document.getElementById('img-preview-container');
+  if (previewContainer) previewContainer.innerHTML = '';
+  document.getElementById('form-title').textContent = 'Add New Product';
+  document.getElementById('form-icon').textContent = 'add_circle';
+  document.getElementById('save-label').textContent = 'Save Product';
+  document.getElementById('save-icon').textContent = 'save';
+}
+
+function editProduct(id) {
+  id = Number(id);
+  const p = allProducts.find(x => Number(x.id) === id);
+  if (!p) return;
+  editId = p.id;
+  document.getElementById('f-name').value = p.name || '';
+  document.getElementById('f-company').value = p.company || '';
+  document.getElementById('f-category').value = p.category || '';
+  document.getElementById('f-price').value = p.price || '';
+  document.getElementById('f-mrp').value = p.mrp || '';
+  document.getElementById('f-badge').value = p.badge || '';
+  document.getElementById('f-item-code').value = p.item_code || '';
+  document.getElementById('f-hsn-code').value = p.hsn_code || '';
+  document.getElementById('f-size-name').value = p.sizename || p.sizeName || '';
+  const imgs = Array.isArray(p.images) ? p.images : [];
+  document.getElementById('f-img-1').value = imgs[0] || p.img || '';
+  document.getElementById('f-img-2').value = imgs[1] || '';
+  document.getElementById('f-img-3').value = imgs[2] || '';
+  document.getElementById('f-img-4').value = imgs[3] || '';
+  document.getElementById('f-desc').value = p.description || '';
+  const qtyType = p.qtytype || p.qtyType || 'input';
+  document.getElementById(qtyType === 'tiers' ? 'qty-type-tiers' : 'qty-type-input').checked = true;
+  toggleSizeTable();
+  clearSizeRows();
+  // Load existing sizes — stored as [{label,price,mrp}] or legacy ["1Pis:280"]
+  const rawSizes = Array.isArray(p.sizes) ? p.sizes : [];
+  rawSizes.forEach(s => {
+    if (typeof s === 'object' && s.label) {
+      addSizeRow(s.label, s.price ?? '', s.mrp ?? '');
+    } else {
+      const parts = s.toString().split(':');
+      addSizeRow(parts[0].trim(), parts[1] ? parts[1].trim() : '', '');
+    }
+  });
+  previewImg();
+  document.getElementById('form-title').textContent = 'Edit Product';
+  document.getElementById('form-icon').textContent = 'edit';
+  document.getElementById('save-label').textContent = 'Update Product';
+  document.getElementById('save-icon').textContent = 'update';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function saveProduct() {
+  const name = document.getElementById('f-name').value.trim();
+  const company = document.getElementById('f-company').value.trim();
+  const category = document.getElementById('f-category').value;
+  const price = parseFloat(document.getElementById('f-price').value);
+
+  if (!name) { alert('Product name is required.'); return; }
+  if (!company) { alert('Company / Brand is required.'); return; }
+  if (!category) { alert('Please select a category.'); return; }
+  if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
+
+  const urls = [
+    document.getElementById('f-img-1').value.trim(),
+    document.getElementById('f-img-2').value.trim(),
+    document.getElementById('f-img-3').value.trim(),
+    document.getElementById('f-img-4').value.trim()
+  ].filter(Boolean);
+
+  const isTiers = document.getElementById('qty-type-tiers').checked;
+  const sizeRows = isTiers ? getSizeRows() : [];
+  // Use first size price as default product price if tiers
+  const defaultPrice = (isTiers && sizeRows.length && sizeRows[0].price) ? sizeRows[0].price : price;
+  const defaultMrp   = (isTiers && sizeRows.length && sizeRows[0].mrp)   ? sizeRows[0].mrp   : (parseFloat(document.getElementById('f-mrp').value) || price);
+
+  const product = {
+    name, company, category,
+    price: defaultPrice,
+    mrp: defaultMrp,
+    badge: document.getElementById('f-badge').value.trim() || null,
+    img: urls[0] || '',
+    images: urls,
+    description: document.getElementById('f-desc').value.trim(),
+    sizeName: document.getElementById('f-size-name').value.trim(),
+    qtyType: isTiers ? 'tiers' : 'input',
+    hasColors: false,
+    sizes: sizeRows,
+    inStock: true,
+    item_code: document.getElementById('f-item-code').value.trim(),
+    hsn_code: document.getElementById('f-hsn-code').value.trim()
+  };
+  if (editId) product.id = editId;
+
+  const ok = await dbSaveProduct(product);
+  if (!ok) { alert('Failed to save product. Check console.'); return; }
+
+  await loadAndRender();
+  resetForm();
+  showToast(editId ? 'Product updated!' : 'Product added!');
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  const ok = await dbDeleteProduct(id);
+  if (!ok) { alert('Failed to delete. Check console.'); return; }
+  await loadAndRender();
+  showToast('Product deleted.');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✓ ' + msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+
+function populateCompanyFilter() {
+  const companies = [...new Set(allProducts.map(p => p.company))].filter(Boolean).sort();
+  const select = document.getElementById('company-filter');
+  if (!select) return;
+  const currentVal = select.value;
+  select.innerHTML = '<option value="">All Companies</option>' + companies.map(c => `<option value="${c}">${c}</option>`).join('');
+  select.value = currentVal;
+}
+
+let allProducts = [];
+
+async function loadAndRender() {
+  allProducts = await dbGetProducts();
+  populateCompanyFilter();
+  renderTable();
+}
+
+function renderTable() {
+  let products = allProducts.filter(p => {
+    const search = document.getElementById('search-filter')?.value.toLowerCase() || '';
+    const cat = document.getElementById('category-filter')?.value || '';
+    const comp = document.getElementById('company-filter')?.value || '';
+    return (!search 
+      || p.name.toLowerCase().includes(search)
+      || (p.item_code && p.item_code.toLowerCase().includes(search))
+      || (p.hsn_code && p.hsn_code.toLowerCase().includes(search))
+      || (p.company && p.company.toLowerCase().includes(search))
+      || (p.category && p.category.toLowerCase().includes(search))
+    )
+      && (!cat || p.category === cat)
+      && (!comp || p.company === comp);
+  });
+
+  const tbody = document.getElementById('product-tbody');
+  const empty = document.getElementById('empty-msg');
+  document.getElementById('product-count').textContent = products.length + ' product' + (products.length !== 1 ? 's' : '');
+
+  if (products.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = products.map(p => {
+    const price = Number(p.price);
+    const mrp = Number(p.mrp) || price;
+    const disc = mrp > price ? Math.round((1 - price / mrp) * 100) : 0;
+    const imgEl = p.img
+      ? `<img class="td-img" src="${p.img}" alt="${p.name}" onerror="this.style.display='none'"/>`
+      : `<div class="td-img" style="display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="color:#ccc;font-size:22px;">image_not_supported</span></div>`;
+    const sizesArr = Array.isArray(p.sizes) ? p.sizes.map(s => typeof s === 'object' ? s.label : String(s)).filter(Boolean) : [];
+    return `<tr>
+      <td>${imgEl}</td>
+      <td>
+        <div class="td-name">${p.name}</div>
+        <div style="font-size:11px;color:#666;margin-top:2px;display:flex;gap:4px;flex-wrap:wrap;">
+          ${p.item_code ? `<span style="background:#ede9ff;color:#4b41e1;padding:1px 6px;border-radius:4px;font-weight:600;">Code: ${p.item_code}</span>` : ''}
+          ${p.hsn_code ? `<span style="background:#e8e8e8;color:#555;padding:1px 6px;border-radius:4px;font-weight:600;">HSN: ${p.hsn_code}</span>` : ''}
+        </div>
+        ${p.badge ? `<span style="font-size:10px;font-weight:700;color:#009668;display:block;margin-top:2px;">${p.badge}</span>` : ''}
+        ${p.description ? `<div style="font-size:11px;color:#aaa;margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.description}</div>` : ''}
+      </td>
+      <td><span class="td-cat">${p.category}</span></td>
+      <td class="td-price">₹${price.toFixed(2)}${disc > 0 ? `<span style="font-size:11px;color:#e53935;font-weight:700;margin-left:4px;">${disc}% OFF</span>` : ''}</td>
+      <td class="td-mrp">₹${mrp.toFixed(2)}</td>
+      <td class="td-sizes">${sizesArr.join(', ') || '—'}</td>
+      <td>
+        <button class="action-btn" title="Edit" onclick="editProduct(${p.id})">
+          <span class="material-symbols-outlined" style="font-size:20px;">edit</span>
+        </button>
+        <button class="action-btn del" title="Delete" onclick="deleteProduct(${p.id})">
+          <span class="material-symbols-outlined" style="font-size:20px;">delete</span>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Excel Export ──
+function exportExcel() {
+  if (!allProducts.length) { alert('No products to export.'); return; }
+
+  const rows = allProducts.map(p => {
+    const imgs = Array.isArray(p.images) ? p.images : (p.img ? [p.img] : []);
+    const qtyType = p.qtytype || p.qtyType || 'input';
+    const sizes = Array.isArray(p.sizes) ? p.sizes : [];
+
+    const row = {
+      Name:        p.name        || '',
+      ItemCode:    p.item_code   || '',
+      HSNCode:     p.hsn_code    || '',
+      Company:     p.company     || '',
+      Category:    p.category    || '',
+      Price:       Number(p.price) || 0,
+      MRP:         Number(p.mrp)   || 0,
+      Badge:       p.badge       || '',
+      Description: p.description || '',
+      SizeName:    p.sizename || p.sizeName || '',
+      QtyType:     qtyType,
+      Image1:      imgs[0] || '',
+      Image2:      imgs[1] || '',
+      Image3:      imgs[2] || '',
+      Image4:      imgs[3] || ''
+    };
+
+    // Add up to 10 tier columns
+    for (let i = 0; i < 10; i++) {
+      const s = sizes[i];
+      if (s && typeof s === 'object') {
+        row['Tier' + (i+1) + '_Label'] = s.label || '';
+        row['Tier' + (i+1) + '_Price'] = s.price != null ? s.price : '';
+        row['Tier' + (i+1) + '_MRP']   = s.mrp   != null ? s.mrp   : '';
+      } else if (s) {
+        row['Tier' + (i+1) + '_Label'] = String(s);
+        row['Tier' + (i+1) + '_Price'] = '';
+        row['Tier' + (i+1) + '_MRP']   = '';
+      } else {
+        row['Tier' + (i+1) + '_Label'] = '';
+        row['Tier' + (i+1) + '_Price'] = '';
+        row['Tier' + (i+1) + '_MRP']   = '';
+      }
+    }
+    return row;
+  });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  // Column widths
+  const widths = [22,14,14,18,14,8,8,12,30,10,8,30,30,30,30];
+  for (let i = 0; i < 10; i++) widths.push(14, 8, 8);
+  ws['!cols'] = widths.map(w => ({ wch: w }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Products');
+  XLSX.writeFile(wb, 'JMS_Products_' + new Date().toISOString().slice(0,10) + '.xlsx');
+  showToast('Exported ' + rows.length + ' products!');
+}
+
+// ── Excel Import ──
+async function importExcel(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(ev) {
+    try {
+      const wb = XLSX.read(ev.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws);
+      if (!rows.length) { alert('No data found in file.'); return; }
+
+      // Save all new categories first
+      const importedCats = [...new Set(rows.map(r => (r['Category'] || '').toString().trim()).filter(Boolean))];
+      for (const cat of importedCats) await dbSaveCategory(cat);
+
+      let inserted = 0, updated = 0, skipped = 0, failed = 0;
+
+      for (const row of rows) {
+        const name  = (row['Name']  || '').toString().trim();
+        const price = parseFloat(row['Price']);
+        if (!name || isNaN(price)) { failed++; continue; }
+
+        const mrp         = parseFloat(row['MRP'])         || price;
+        const company     = (row['Company']     || '').toString().trim();
+        const category    = (row['Category']    || '').toString().trim();
+        const badge       = (row['Badge']       || '').toString().trim() || null;
+        const description = (row['Description'] || '').toString().trim();
+        const sizeName    = (row['SizeName']    || '').toString().trim();
+        const qtyType     = (row['QtyType']     || 'input').toString().trim();
+        const itemCode    = (row['ItemCode']    || '').toString().trim();
+        const hsnCode     = (row['HSNCode']     || '').toString().trim();
+        const imgs        = ['Image1','Image2','Image3','Image4']
+          .map(k => (row[k] || '').toString().trim()).filter(Boolean);
+
+        // Build sizes from Tier1_Label/Price/MRP ... Tier10_Label/Price/MRP columns
+        const sizes = [];
+        for (let i = 1; i <= 10; i++) {
+          const label = (row['Tier' + i + '_Label'] || '').toString().trim();
+          if (!label) break;
+          const tp  = row['Tier' + i + '_Price'];
+          const tm  = row['Tier' + i + '_MRP'];
+          sizes.push({
+            label,
+            price: tp !== '' && tp != null && !isNaN(parseFloat(tp)) ? parseFloat(tp) : null,
+            mrp:   tm !== '' && tm != null && !isNaN(parseFloat(tm)) ? parseFloat(tm) : null
+          });
+        }
+
+        const existing = allProducts.find(p => p.name.trim().toLowerCase() === name.toLowerCase());
+
+        if (existing) {
+          const existingImgs  = Array.isArray(existing.images) ? existing.images : (existing.img ? [existing.img] : []);
+          const existingSizes = JSON.stringify(Array.isArray(existing.sizes) ? existing.sizes : []);
+          const changed =
+            Number(existing.price)  !== price       ||
+            Number(existing.mrp)    !== mrp         ||
+            (existing.company     || '') !== company     ||
+            (existing.category    || '') !== category    ||
+            (existing.badge       || null) !== badge     ||
+            (existing.description || '') !== description ||
+            (existing.sizename || existing.sizeName || '') !== sizeName ||
+            (existing.qtytype  || existing.qtyType  || 'input') !== qtyType ||
+            (existing.item_code   || '') !== itemCode    ||
+            (existing.hsn_code    || '') !== hsnCode     ||
+            existingSizes !== JSON.stringify(sizes)  ||
+            (imgs.length > 0 && imgs[0] !== (existingImgs[0] || ''));
+
+          if (!changed) { skipped++; continue; }
+
+          const ok = await dbSaveProduct({
+            id: existing.id, name, company, category, price, mrp, badge, description,
+            sizeName, qtyType, sizes,
+            item_code: itemCode, hsn_code: hsnCode,
+            img:    imgs.length ? imgs[0] : (existing.img || ''),
+            images: imgs.length ? imgs    : existingImgs
+          });
+          if (ok) updated++; else failed++;
+        } else {
+          const ok = await dbSaveProduct({
+            name, company, category, price, mrp, badge, description,
+            sizeName, qtyType, sizes,
+            item_code: itemCode, hsn_code: hsnCode,
+            img: imgs[0] || '', images: imgs, inStock: true
+          });
+          if (ok) inserted++; else failed++;
+        }
+      }
+
+      await loadAndRender();
+      await populateCategorySelects();
+      showToast(`Done: ${inserted} added, ${updated} updated, ${skipped} unchanged${failed ? ', ' + failed + ' failed' : ''}`);
+    } catch(err) {
+      console.error(err);
+      alert('Failed to read file. Make sure it is a valid Excel or CSV file.');
+    }
+    e.target.value = '';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function saveWhatsAppNumber() {
+  const input = document.getElementById('cfg-whatsapp-phone');
+  const btn = input.nextElementSibling;
+  const originalText = btn.innerHTML;
+
+  const rawNum = input.value.trim();
+  const cleanNum = rawNum.replace(/\D/g, '');
+  if (!cleanNum || cleanNum.length < 10) {
+    alert('Please enter a valid WhatsApp number (including country code, e.g. 917693048234).');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">sync</span> Saving...`;
+
+  const ok = await dbSaveSetting('whatsapp_number', cleanNum);
+  btn.disabled = false;
+  btn.innerHTML = originalText;
+
+  if (ok) {
+    showToast('WhatsApp number saved!');
+  } else {
+    alert('Failed to save WhatsApp number. Check console.');
+  }
+}
+
+(async () => {
+  await populateCategorySelects();
+  await loadAndRender();
+  try {
+    const num = await dbGetSetting('whatsapp_number', '917693048234');
+    document.getElementById('cfg-whatsapp-phone').value = num;
+  } catch (err) {
+    console.error('Error loading WhatsApp number setting:', err);
+  }
+})();
+</script>
+</body>
+</html>

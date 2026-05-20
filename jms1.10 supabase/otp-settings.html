@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>OTP Settings – Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="ios-fix.css" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f7f9fb;
+      color: #111;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 5rem 1.5rem 2rem;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .75rem 1rem;
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      z-index: 50;
+    }
+
+    .header-company {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -.3px;
+      color: #111;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .header-company:hover {
+      color: #4b41e1;
+    }
+
+    @media (max-width: 600px) {
+      .header-company {
+        position: static;
+        transform: none;
+        font-size: 14px;
+      }
+    }
+
+    .card {
+      background: #fff;
+      border-radius: .75rem;
+      border: 1px solid #e8e8e8;
+      padding: 2rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, .07);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 1.4rem;
+    }
+
+    .today-box {
+      background: #ede9ff;
+      border-radius: .6rem;
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.4rem;
+    }
+
+    .today-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #4b41e1;
+    }
+
+    .today-code {
+      font-size: 32px;
+      font-weight: 900;
+      color: #4b41e1;
+      letter-spacing: 2px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+      margin-bottom: 1rem;
+    }
+
+    .field label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .field input,
+    .field select {
+      border: 1.5px solid #ddd;
+      border-radius: .4rem;
+      padding: .6rem .75rem;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s;
+      background: #fff;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: #4b41e1;
+    }
+
+    .field .hint {
+      font-size: 12px;
+      color: #888;
+      margin-top: .3rem;
+      line-height: 1.5;
+    }
+
+    .formula-preview {
+      background: #f7f9fb;
+      border: 1.5px solid #e0e3e5;
+      border-radius: .4rem;
+      padding: .6rem .75rem;
+      font-size: 14px;
+      font-weight: 700;
+      color: #4b41e1;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+    }
+
+    .vars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .5rem;
+      margin-bottom: 1rem;
+    }
+
+    .var-chip {
+      background: #f0eeff;
+      border: 1.5px solid #c5beff;
+      border-radius: .4rem;
+      padding: .4rem .5rem;
+      font-size: 12px;
+      font-weight: 700;
+      color: #4b41e1;
+      text-align: center;
+      cursor: pointer;
+      transition: background .15s;
+      user-select: none;
+    }
+
+    .var-chip:hover {
+      background: #ddd8ff;
+    }
+
+    .error {
+      color: #e53935;
+      font-size: 13px;
+      min-height: 18px;
+      font-weight: 600;
+      margin-bottom: .4rem;
+    }
+
+    .success {
+      color: #009668;
+      font-size: 13px;
+      min-height: 18px;
+      font-weight: 600;
+      margin-bottom: .4rem;
+    }
+
+    .btn-save {
+      width: 100%;
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: .5rem;
+      padding: .8rem;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      transition: background .15s;
+      margin-top: .4rem;
+    }
+
+    .btn-save:hover {
+      background: #4b41e1;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .3rem;
+      background: none;
+      border: 1.5px solid #ddd;
+      border-radius: .5rem;
+      padding: .65rem 1.2rem;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #555;
+      text-decoration: none;
+      margin-top: .75rem;
+      transition: border-color .15s;
+      width: 100%;
+    }
+
+    .btn-back:hover {
+      border-color: #4b41e1;
+      color: #4b41e1;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 1.2rem 0;
+    }
+
+    /* Auth overlay */
+    #auth-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, .5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #auth-box {
+      background: #fff;
+      border-radius: .75rem;
+      padding: 2rem;
+      width: 90%;
+      max-width: 340px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .2);
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Auth overlay — shown first -->
+  <div id="auth-overlay">
+    <div id="auth-box">
+      <span class="material-symbols-outlined" style="font-size:40px;color:#4b41e1;">lock</span>
+      <h2 style="font-size:17px;font-weight:800;margin:.75rem 0 .3rem;">Admin Password Required</h2>
+      <p style="font-size:13px;color:#666;margin-bottom:1.2rem;">Enter your admin password to access OTP settings.</p>
+      <input type="password" id="auth-pass" placeholder="Admin password"
+        style="width:100%;border:1.5px solid #ddd;border-radius:.4rem;padding:.6rem .75rem;font-size:14px;outline:none;margin-bottom:.5rem;" />
+      <p id="auth-error" style="color:#e53935;font-size:12px;min-height:16px;margin-bottom:.5rem;"></p>
+      <button onclick="verifyAuth()"
+        style="width:100%;background:#4b41e1;color:#fff;border:none;border-radius:.5rem;padding:.75rem;font-size:15px;font-weight:700;cursor:pointer;">
+        Unlock
+      </button>
+      <a href="admin.html" style="display:block;margin-top:.75rem;font-size:13px;color:#888;text-decoration:none;">←
+        Back to Admin</a>
+    </div>
+  </div>
+
+  <header>
+    <a href="admin.html"
+      style="display:flex;align-items:center;gap:.3rem;font-size:14px;font-weight:600;color:#4b41e1;text-decoration:none;">
+      <span class="material-symbols-outlined" style="font-size:20px;">arrow_back</span> Back
+    </a>
+    <a href="index.html" class="header-company">Jain Machinery Stores</a>
+    <div style="width:80px;"></div>
+  </header>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="material-symbols-outlined" style="font-size:22px;color:#4b41e1;">pin</span>
+      OTP / Daily Code Settings
+    </div>
+
+    <!-- Today's code display -->
+    <div class="today-box">
+      <div>
+        <div class="today-label">Today's Access Code</div>
+        <div style="font-size:12px;color:#888;margin-top:2px;" id="today-date"></div>
+      </div>
+      <div class="today-code" id="today-code">—</div>
+    </div>
+
+    <!-- Formula builder -->
+    <div class="field">
+      <label>Formula Expression</label>
+      <input type="text" id="formula-input" placeholder="e.g. {date} * ({month} + 1) + 5" oninput="previewFormula()" />
+      <div class="hint">
+        Use variables: <b>{date}</b> (1–31), <b>{month}</b> (1–12), <b>{year}</b> (e.g. 2025), <b>{day}</b>
+        (0=Sun…6=Sat)<br>
+        Use any math: <code>+  −  *  /  %  (  )</code> and plain numbers.<br>
+        Result is rounded to nearest integer.
+      </div>
+    </div>
+
+    <!-- Quick-insert variable chips -->
+    <div class="vars-grid">
+      <div class="var-chip" onclick="insertVar('{date}')">{date}</div>
+      <div class="var-chip" onclick="insertVar('{month}')">{month}</div>
+      <div class="var-chip" onclick="insertVar('{year}')">{year}</div>
+      <div class="var-chip" onclick="insertVar('{day}')">{day}</div>
+      <div class="var-chip" onclick="insertVar(' + ')">+</div>
+      <div class="var-chip" onclick="insertVar(' * ')">×</div>
+    </div>
+
+    <div class="field">
+      <label>Preview — code for today</label>
+      <div class="formula-preview" id="formula-preview">—</div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="field">
+      <label>Confirm Admin Password *</label>
+      <input type="password" id="save-pass" placeholder="Re-enter admin password to save" />
+    </div>
+
+    <div class="error" id="err-msg"></div>
+    <div class="success" id="ok-msg"></div>
+
+    <button class="btn-save" onclick="saveFormula()">
+      <span class="material-symbols-outlined" style="font-size:18px;">save</span>
+      Save Formula
+    </button>
+
+    <a href="admin.html" class="btn-back">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+      Back to Admin Panel
+    </a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script>
+    if (sessionStorage.getItem('qf_admin_logged_in') !== 'true') {
+      window.location.href = 'login.html';
+    }
+
+    const DEFAULT_FORMULA = '{date} * ({month} + 1) + 5';
+    let _creds = { password: 'admin123' };
+    let _formula = DEFAULT_FORMULA;
+
+    async function loadSettings() {
+      _creds.password = await dbGetSetting('admin_password', 'admin123');
+      _formula = await dbGetSetting('otp_formula', DEFAULT_FORMULA);
+    }
+
+    function getCreds() { return _creds; }
+    function getFormula() { return _formula; }
+
+    // Evaluate formula safely with today's date values
+    function evalFormula(expr) {
+      const now = new Date();
+      const date = now.getDate();
+      const month = now.getMonth() + 1;
+      const year = now.getFullYear();
+      const day = now.getDay();
+      // Replace variables then evaluate only safe math expression
+      const safe = expr
+        .replace(/\{date\}/g, date)
+        .replace(/\{month\}/g, month)
+        .replace(/\{year\}/g, year)
+        .replace(/\{day\}/g, day);
+      // Allow only digits, spaces, and math operators
+      if (!/^[\d\s\+\-\*\/\%\(\)\.]+$/.test(safe)) throw new Error('Invalid characters');
+      // eslint-disable-next-line no-new-func
+      const result = Function('"use strict"; return (' + safe + ')')();
+      if (!isFinite(result)) throw new Error('Result is not a number');
+      return String(Math.round(result));
+    }
+
+    // ── Auth overlay ──
+    async function verifyAuth() {
+      await loadSettings();
+      const pass = document.getElementById('auth-pass').value;
+      if (pass === getCreds().password) {
+        document.getElementById('auth-overlay').style.display = 'none';
+        init();
+      } else {
+        document.getElementById('auth-error').textContent = 'Incorrect password.';
+        document.getElementById('auth-pass').value = '';
+      }
+    }
+    document.getElementById('auth-pass').addEventListener('keydown', e => { if (e.key === 'Enter') verifyAuth(); });
+
+    // ── Init page ──
+    function init() {
+      const now = new Date();
+      document.getElementById('today-date').textContent =
+        now.toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+      const formula = getFormula();
+      document.getElementById('formula-input').value = formula;
+
+      try {
+        var code = evalFormula(formula);
+        document.getElementById('today-code').textContent = code;
+      } catch (e) { document.getElementById('today-code').textContent = 'ERR'; }
+
+      previewFormula();
+    }
+
+    function previewFormula() {
+      const expr = document.getElementById('formula-input').value.trim();
+      const preview = document.getElementById('formula-preview');
+      if (!expr) { preview.textContent = '—'; return; }
+      try {
+        preview.textContent = evalFormula(expr);
+        preview.style.color = '#4b41e1';
+      } catch (e) {
+        preview.textContent = 'Invalid formula';
+        preview.style.color = '#e53935';
+      }
+    }
+
+    function insertVar(v) {
+      const inp = document.getElementById('formula-input');
+      const pos = inp.selectionStart;
+      const val = inp.value;
+      inp.value = val.slice(0, pos) + v + val.slice(pos);
+      inp.focus();
+      inp.setSelectionRange(pos + v.length, pos + v.length);
+      previewFormula();
+    }
+
+    async function saveFormula() {
+      var expr = document.getElementById('formula-input').value.trim();
+      var pass = document.getElementById('save-pass').value;
+      var errEl = document.getElementById('err-msg');
+      var okEl = document.getElementById('ok-msg');
+      errEl.textContent = ''; okEl.textContent = '';
+
+      if (!expr) { errEl.textContent = 'Formula cannot be empty.'; return; }
+      if (!pass) { errEl.textContent = 'Please enter your admin password to save.'; return; }
+      if (pass !== getCreds().password) { errEl.textContent = 'Incorrect admin password.'; return; }
+
+      try { evalFormula(expr); } catch (e) { errEl.textContent = 'Formula error: ' + e.message; return; }
+
+      const saved = await dbSaveSetting('otp_formula', expr);
+      if (!saved) { errEl.textContent = 'Failed to save. Check your connection.'; return; }
+      _formula = expr;
+      document.getElementById('save-pass').value = '';
+      sessionStorage.removeItem('jms_code_verified');
+
+      try { document.getElementById('today-code').textContent = evalFormula(expr); } catch (e) { }
+
+      okEl.textContent = 'Formula saved! New code is active.';
+      setTimeout(function () { okEl.textContent = ''; }, 3500);
+    }
+  </script>
+</body>
+
+</html>
