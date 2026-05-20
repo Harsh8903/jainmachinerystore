@@ -1,0 +1,91 @@
+/* ── iOS / Safari Universal Fixes ── */
+
+/* Prevent iOS font size inflation */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Safe area insets for iPhone notch / home bar */
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Fix iOS input zoom (font-size must be >= 16px) */
+input:not([type=radio]):not([type=checkbox]), textarea, select {
+  font-size: 16px !important;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+/* Fix iOS button tap highlight */
+button, a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Fix sticky header on iOS Safari */
+header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+/* Fix bottom nav safe area on iPhone */
+nav.bottom-nav, nav[class*="fixed bottom"] {
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+}
+
+/* Fix 100vh on iOS Safari (address bar shrinks viewport) */
+.min-h-screen, [style*="min-height: 100vh"] {
+  min-height: -webkit-fill-available;
+}
+
+/* Fix overflow scroll on iOS */
+.overflow-y-auto, .overflow-x-auto, [style*="overflow"] {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix pin-overlay always visible on touch (no hover on iOS) */
+@media (hover: none) and (pointer: coarse) {
+  .pin-overlay {
+    opacity: 1 !important;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%) !important;
+  }
+  .pin-save-btn {
+    opacity: 1 !important;
+    font-size: 11px !important;
+    padding: .25rem .6rem !important;
+  }
+  .pin-card:hover .pin-save-btn { transform: none; }
+}
+
+/* Fix modal bottom sheet on iOS */
+@media (max-width: 600px) {
+  #wa-modal-box, .modal-box {
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Fix select arrow on iOS */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px !important;
+}
+
+/* Fix cart item layout on small iOS screens */
+@media (max-width: 390px) {
+  .cart-item { flex-wrap: wrap; }
+  .item-actions { width: 100%; flex-direction: row; justify-content: space-between; align-items: center; margin-top: .5rem; }
+  .item-img { width: 64px; height: 64px; }
+}
+
+/* Fix page-wrap padding on iPhone SE */
+@media (max-width: 375px) {
+  .page-wrap { padding: 0 1rem 4rem; }
+}
+
+/* Fix bottom nav overlap with content */
+main { padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
+@media (min-width: 768px) { main { padding-bottom: 2rem; } }

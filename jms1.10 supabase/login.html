@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="ios-fix.css"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#000000",
+                        "on-primary": "#ffffff",
+                        "secondary": "#4b41e1",
+                        "on-secondary": "#ffffff",
+                        "background": "#f7f9fb",
+                        "surface": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "outline-variant": "#c6c6cd",
+                        "error": "#ba1a1a"
+                    },
+                    "fontFamily": {
+                        "sans": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-sans min-h-screen flex flex-col items-center justify-center p-4">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="dailyCode.js"></script>
+
+  <a href="index.html" style="position:fixed;top:0;left:0;right:0;height:52px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;letter-spacing:-.3px;color:#111;text-decoration:none;z-index:50;" onmouseover="this.style.color='#4b41e1'" onmouseout="this.style.color='#111'">Jain Machinery Stores</a>
+
+  <div style="height:52px;"></div>
+
+    <div class="glass-card rounded-2xl w-full max-w-md p-8 relative overflow-hidden">
+        <!-- Decorative blob -->
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-secondary rounded-full blur-3xl opacity-20 pointer-events-none"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-primary rounded-full blur-3xl opacity-10 pointer-events-none"></div>
+
+        <div class="text-center mb-8 relative z-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary text-white mb-4 shadow-lg shadow-secondary/30">
+                <span class="material-symbols-outlined" style="font-size: 32px;">admin_panel_settings</span>
+            </div>
+            <h1 class="text-2xl font-bold text-primary mb-2">Admin Panel Login</h1>
+            <p class="text-sm text-gray-500">Sign in to manage the marketplace</p>
+        </div>
+
+        <form id="login-form" class="space-y-6 relative z-10">
+            <div id="error-message" class="hidden bg-red-50 text-error text-sm p-3 rounded-lg flex items-center gap-2 border border-red-100">
+                <span class="material-symbols-outlined text-sm">error</span>
+                <span>Invalid username or password.</span>
+            </div>
+
+            <div>
+                <label for="username" class="block text-sm font-semibold text-gray-700 mb-1">Username</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="material-symbols-outlined text-gray-400 text-lg">person</span>
+                    </div>
+                    <input type="text" id="username" name="username" class="w-full pl-10 pr-4 py-3 rounded-xl border border-outline-variant bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all text-sm outline-none" placeholder="Enter your username" required autofocus>
+                </div>
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="material-symbols-outlined text-gray-400 text-lg">lock</span>
+                    </div>
+                    <input type="password" id="password" name="password" class="w-full pl-10 pr-4 py-3 rounded-xl border border-outline-variant bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all text-sm outline-none" placeholder="Enter your password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-secondary hover:bg-secondary/90 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-secondary/20 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+                <span>Sign In</span>
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+        </form>
+        
+        <div class="mt-6 text-center">
+            <a href="index.html" class="text-sm text-gray-500 hover:text-secondary transition-colors inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+                Return to Marketplace
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-message');
+            
+            const btn = this.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span><span>Authenticating...</span>';
+            btn.disabled = true;
+
+            const storedUser = await dbGetSetting('admin_username', 'admin');
+            const storedPass = await dbGetSetting('admin_password', 'admin123');
+
+            if (username === storedUser && password === storedPass) {
+                sessionStorage.setItem('qf_admin_logged_in', 'true');
+                window.location.href = 'admin.html';
+            } else {
+                errorMsg.classList.remove('hidden');
+                const form = document.getElementById('login-form');
+                form.classList.add('animate-shake');
+                setTimeout(() => form.classList.remove('animate-shake'), 500);
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                document.getElementById('password').value = '';
+            }
+        });
+    </script>
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>
